@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>QR Scanner Madrasah</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      background: #f9fbe7;
+      margin: 0;
+      padding: 0;
+    }
+    #reader {
+      width: 300px;
+      margin: 20px auto;
+    }
+    #hasil {
+      white-space: pre-line;
+      padding: 10px;
+      margin: 10px auto;
+      width: 90%;
+      max-width: 400px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+    .logo {
+      margin-top: 20px;
+    }
+    .quote {
+      font-style: italic;
+      font-size: 0.9em;
+      margin-top: 30px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="logo">
+    <img src="logo-madrasah.png" alt="Logo Madrasah" width="150">
+    <h2>📷 QR Scanner Madrasah</h2>
+  </div>
+
+  <div id="reader"></div>
+  <div id="hasil">Silakan scan QR guru atau siswa</div>
+
+  <!-- Dua notifikasi berbeda -->
+  <audio id="notifMasuk" src="selamat-datang.mp3" preload="auto"></audio>
+  <audio id="notifPulang" src="terima-kasih.mp3" preload="auto"></audio>
+
+  <div class="quote">
+    "Ilmu itu cahaya, dan cahaya Allah tidak diberikan kepada pelaku maksiat." – Imam Syafi'i
+  </div>
+
+  <script>
+    const html5QrCode = new Html5Qrcode("reader");
+
+    // Aktifkan audio setelah interaksi pertama
+    document.body.addEventListener("click", () => {
+  const masuk = document.getElementById("notifMasuk");
+  const pulang = document.getElementById("notifPulang");
+
+  masuk.muted = true;
+  pulang.muted = true;
+
+  masuk.play().catch(() => {});
+  pulang.play().catch(() => {});
+
+  setTimeout(() => {
+    masuk.pause();
+    pulang.pause();
+    masuk.currentTime = 0;
+    pulang.currentTime = 0;
+    masuk.muted = false;
+    pulang.muted = false;
+  }, 100);
+});
+
+    function tampilkanHasil(teks, warna) {
+      const hasil = document.getElementById("hasil");
+      hasil.innerText = teks;
+      hasil.style.backgroundColor = warna;
+      hasil.style.color = "#fff";
+    }
+
+    function mulaiScan() {
+      html5QrCode.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: 250 },
+        onScanSuccess
+      ).catch(err => {
+        tampilkanHasil("❌ Gagal membuka kamera: " + err.message, "#c62828");
+      });
+    }
+
+    function kirimKeSpreadsheet(qrText) {
+      const [tipe, nama, id, kelas] = qrText.split("|");
+      const payload = new URLSearchParams({ tipe, nama, id, kelas });
+
+      fetch("https://script.google.com/macros/s/AKfycbwa6Nr_WDA1DM763RFYDnunCw-LKtDDBITNDqWNsb7Lp7TEAtCHmBuMOQG0HvVGAB4V/exec", {
+        method: "POST",
+        body: payload
+      })
+      .then(res => res.json())
+      .then(res => {
+        const warna = res.status === "success" ? "#2e7d32" : res.status === "info" ? "#f9a825" : "#c62828";
+        tampilkanHasil(res.message, warna);
+
+        const msg = res.message.toLowerCase();
+        if (msg.includes("masuk")) {
+          document.getElementById("notifMasuk").play();
+        } else if (msg.includes("pulang")) {
+          document.getElementById("notifPulang").play();
+        }
+
+        setTimeout(() => {
+          mulaiScan(); // aktifkan ulang kamera
+        }, 3000);
+      })
+      .catch(err => {
+        tampilkanHasil("❌ Gagal kirim: " + err.message, "#c62828");
+        setTimeout(() => {
+          mulaiScan();
+        }, 3000);
+      });
+    }
+
+    function onScanSuccess(text) {
+      html5QrCode.stop().then(() => {
+        tampilkanHasil("✅ QR Terdeteksi:\n" + text, "#2e7d32");
+        kirimKeSpreadsheet(text);
+      }).catch(err => {
+        tampilkanHasil("❌ Gagal menghentikan kamera: " + err.message, "#c62828");
+      });
+    }
+
+    // Mulai pertama kali
+    mulaiScan();
+  </script>
+</body>
+</html>
