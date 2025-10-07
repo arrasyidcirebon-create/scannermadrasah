@@ -64,12 +64,14 @@
         [audioMasuk, audioPulang].forEach(audio => {
           if (audio && typeof audio.play === "function") {
             audio.muted = true;
-            audio.play().catch(() => {});
-            setTimeout(() => {
+            audio.play().then(() => {
               audio.pause();
               audio.currentTime = 0;
               audio.muted = false;
-            }, 100);
+              console.log("Audio siap:", audio.id);
+            }).catch(err => {
+              console.warn("Gagal memanaskan audio:", err);
+            });
           }
         });
       }, { once: true });
@@ -113,19 +115,20 @@
           tampilkanHasil(res.message, warna);
 
           const msg = res.message.toLowerCase();
-          // Reset audio sebelum diputar ulang
-          if (audioMasuk) {
-            audioMasuk.pause();
-            audioMasuk.currentTime = 0;
-          }
-          if (audioPulang) {
-            audioPulang.pause();
-            audioPulang.currentTime = 0;
-          }
-          if (msg.includes("masuk") && audioMasuk) {
-            audioMasuk.play().catch(() => {});
-          } else if (msg.includes("pulang") && audioPulang) {
-            audioPulang.play().catch(() => {});
+          const playAudio = (audio) => {
+            if (audio && typeof audio.play === "function") {
+              audio.pause();
+              audio.currentTime = 0;
+              audio.play().catch(err => {
+                console.warn("Gagal memutar audio:", err);
+              });
+            }
+          };
+
+          if (msg.includes("masuk")) {
+            playAudio(audioMasuk);
+          } else if (msg.includes("pulang")) {
+            playAudio(audioPulang);
           }
 
           setTimeout(mulaiScan, 3000);
@@ -150,5 +153,3 @@
   </script>
 </body>
 </html>
-
-
