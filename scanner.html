@@ -114,14 +114,14 @@
 
           const msg = res.message.toLowerCase();
           // Reset audio sebelum diputar ulang
-if (audioMasuk) {
-  audioMasuk.pause();
-  audioMasuk.currentTime = 0;
-}
-if (audioPulang) {
-  audioPulang.pause();
-  audioPulang.currentTime = 0;
-}
+          if (audioMasuk) {
+            audioMasuk.pause();
+            audioMasuk.currentTime = 0;
+          }
+          if (audioPulang) {
+            audioPulang.pause();
+            audioPulang.currentTime = 0;
+          }
           if (msg.includes("masuk") && audioMasuk) {
             audioMasuk.play().catch(() => {});
           } else if (msg.includes("pulang") && audioPulang) {
@@ -150,4 +150,5 @@ if (audioPulang) {
   </script>
 </body>
 </html>
+
 
