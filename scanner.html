@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>QR Scanner Madrasah</title>
-  <link rel="icon" href="favicon.png" type="image/png">
+  <link rel="icon" href="https://cdn.jsdelivr.net/gh/arrays/dicirebon-create/scannermadrosah/favicon.png" type="image/png">
   <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
     body {
@@ -39,15 +39,15 @@
 </head>
 <body>
   <div class="logo">
-    <img src="logo-madrasah.png" alt="Logo Madrasah" width="150">
+    <img src="https://cdn.jsdelivr.net/gh/arrays/dicirebon-create/scannermadrosah/logo-madrasah.png" alt="Logo Madrasah" width="150">
     <h2>📷 QR Scanner Madrasah</h2>
   </div>
 
   <div id="reader"></div>
   <div id="hasil">Silakan scan QR guru atau siswa</div>
 
-  <audio id="notifMasuk" src="selamat-datang.mp3" preload="auto"></audio>
-  <audio id="notifPulang" src="terima-kasih.mp3" preload="auto"></audio>
+  <audio id="notifMasuk" src="https://cdn.jsdelivr.net/gh/arrays/dicirebon-create/scannermadrosah/selamat-datang.mp3" preload="auto"></audio>
+  <audio id="notifPulang" src="https://cdn.jsdelivr.net/gh/arrays/dicirebon-create/scannermadrosah/terima-kasih.mp3" preload="auto"></audio>
 
   <div class="quote">
     "Ilmu itu cahaya, dan cahaya Allah tidak diberikan kepada pelaku maksiat." – Imam Syafi'i
@@ -92,7 +92,14 @@
       }
 
       function kirimKeSpreadsheet(qrText) {
-        const [tipe, nama, id, kelas] = qrText.split("|");
+        const bagian = qrText.split("|");
+        if (bagian.length < 4) {
+          tampilkanHasil("❌ Format QR tidak valid", "#c62828");
+          setTimeout(mulaiScan, 3000);
+          return;
+        }
+
+        const [tipe, nama, id, kelas] = bagian;
         const payload = new URLSearchParams({ tipe, nama, id, kelas });
 
         fetch("https://script.google.com/macros/s/AKfycbwa6Nr_WDA1DM763RFYDnunCw-LKtDDBITNDqWNsb7Lp7TEAtCHmBuMOQG0HvVGAB4V/exec", {
