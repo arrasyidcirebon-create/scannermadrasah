@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>QR Scanner Madrasah</title>
+  <link rel="icon" href="favicon.png" type="image/png">
   <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
     body {
@@ -56,26 +57,26 @@
   <script>
     const html5QrCode = new Html5Qrcode("reader");
 
-    // Aktifkan audio setelah interaksi pertama
+    // Pemanasan audio agar tidak diblokir browser
     document.body.addEventListener("click", () => {
-  const masuk = document.getElementById("notifMasuk");
-  const pulang = document.getElementById("notifPulang");
+      const masuk = document.getElementById("notifMasuk");
+      const pulang = document.getElementById("notifPulang");
 
-  masuk.muted = true;
-  pulang.muted = true;
+      masuk.muted = true;
+      pulang.muted = true;
 
-  masuk.play().catch(() => {});
-  pulang.play().catch(() => {});
+      masuk.play().catch(() => {});
+      pulang.play().catch(() => {});
 
-  setTimeout(() => {
-    masuk.pause();
-    pulang.pause();
-    masuk.currentTime = 0;
-    pulang.currentTime = 0;
-    masuk.muted = false;
-    pulang.muted = false;
-  }, 100);
-});
+      setTimeout(() => {
+        masuk.pause();
+        pulang.pause();
+        masuk.currentTime = 0;
+        pulang.currentTime = 0;
+        masuk.muted = false;
+        pulang.muted = false;
+      }, 100);
+    });
 
     function tampilkanHasil(teks, warna) {
       const hasil = document.getElementById("hasil");
@@ -139,5 +140,4 @@
     mulaiScan();
   </script>
 </body>
-
 </html>
