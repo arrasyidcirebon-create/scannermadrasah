@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>QR Scanner Madrasah</title>
   <link rel="icon" href="https://cdn.jsdelivr.net/gh/arrays/dicirebon-create/scannermadrosah/favicon.png" type="image/png">
   <script src="https://unpkg.com/html5-qrcode"></script>
@@ -18,12 +19,14 @@
       margin-top: 20px;
     }
     .logo img {
-      width: 140px;
+      width: 160px;
+      max-width: 80%;
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(255,255,255,0.2);
     }
     #reader {
-      width: 300px;
+      width: 90%;
+      max-width: 400px;
       margin: 20px auto;
       border: 2px solid #c8e6c9;
       border-radius: 10px;
@@ -32,11 +35,12 @@
     }
     #hasil {
       white-space: pre-line;
-      padding: 12px;
+      padding: 14px;
       margin: 10px auto;
       width: 90%;
-      max-width: 400px;
-      border-radius: 10px;
+      max-width: 420px;
+      border-radius: 12px;
+      font-size: 1.1em;
       font-weight: bold;
       background-color: #2e7d32;
       color: #fff;
@@ -44,9 +48,10 @@
     }
     .quote {
       font-style: italic;
-      font-size: 0.9em;
+      font-size: 0.95em;
       margin-top: 30px;
       color: #c8e6c9;
+      padding: 0 20px;
     }
   </style>
 </head>
@@ -72,7 +77,6 @@
       const audioMasuk = document.getElementById("notifMasuk");
       const audioPulang = document.getElementById("notifPulang");
 
-      // Pemanasan audio agar tidak diblokir browser
       document.body.addEventListener("click", () => {
         [audioMasuk, audioPulang].forEach(audio => {
           if (audio && typeof audio.play === "function") {
