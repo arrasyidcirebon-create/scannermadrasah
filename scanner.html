@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QR Scanner Madrasah</title>
+  <title>QR Scanner MDTU Ar Rasyid</title>
   <link rel="icon" href="https://cdn.jsdelivr.net/gh/arrasyidcirebon-create/scannermadrasah/logo-madrasah.png" type="image/png">
   <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
@@ -19,36 +19,31 @@
       margin-top: 20px;
     }
     .logo img {
-     width: 100px;
-     max-width: 60%;
-     border-radius: 6px;
-     box-shadow: 0 0 8px rgba(255,255,255,0.15);
+      width: 100px;
+      max-width: 60%;
+      border-radius: 6px;
+      box-shadow: 0 0 8px rgba(255,255,255,0.15);
     }
-
     h2 {
-    font-size: 1.4em;
-    font-weight: 600;
-    margin-top: 10px;
-    margin-bottom: 5px;
-  }
-
-  @media (max-width: 480px) {
-    h2 {
-      font-size: 1.1em;
+      font-size: 1.4em;
+      font-weight: 600;
+      margin-top: 10px;
+      margin-bottom: 5px;
     }
-  }
-
+    #instruksi {
+      font-size: 0.9em;
+      color: #ffc107;
+      margin-bottom: 10px;
+    }
     #reader {
       width: 100%;
       max-width: 280px;
-      height: auto;
       margin: 16px auto;
       border: 2px solid #c8e6c9;
       border-radius: 10px;
       background-color: #ffffff;
       box-shadow: 0 0 12px rgba(0,0,0,0.2);
-     }
-    
+    }
     #hasil {
       white-space: pre-line;
       padding: 17px;
@@ -69,15 +64,24 @@
       color: #c8e6c9;
       padding: 0 20px;
     }
+    @media (max-width: 480px) {
+      h2 { font-size: 1.1em; }
+      #reader { max-width: 240px; }
+      #hasil { font-size: 1em; max-width: 340px; }
+    }
+    @media (orientation: landscape) {
+      #reader { max-width: 240px; }
+      #hasil { font-size: 1.2em; }
+    }
   </style>
 </head>
 <body>
   <div class="logo">
-    <img src="https://cdn.jsdelivr.net/gh/arrasyidcirebon-create/scannermadrasah/logo-madrasah.png" alt="Logo Madrasah">
+    <img src="https://cdn.jsdelivr.net/gh/arrasyidcirebon-create/scannermadrasah/logo-madrasah.png" alt="Logo MDTU Ar Rasyid">
     <h2>📷 QR Scanner MDTU Ar Rasyid</h2>
-    
   </div>
 
+  <div id="instruksi">🔊 Ketuk layar sebelum scan agar suara aktif di HP</div>
   <div id="reader"></div>
   <div id="hasil">Silakan scan QR guru atau siswa</div>
 
@@ -94,6 +98,7 @@
       const audioMasuk = document.getElementById("notifMasuk");
       const audioPulang = document.getElementById("notifPulang");
 
+      // Pemanasan audio agar bisa diputar di HP
       document.body.addEventListener("click", () => {
         [audioMasuk, audioPulang].forEach(audio => {
           if (audio && typeof audio.play === "function") {
@@ -134,11 +139,18 @@
         }
 
         const { status, waktu } = validasiJamPresensi();
+        if (status === "invalid") {
+          tampilkanHasil("⏰ Di luar jam presensi\nJam: " + waktu, "#f9a825");
+          setTimeout(mulaiScan, 3000);
+          return;
+        }
+
         const [tipe, nama, id, kelas] = bagian;
         const payload = new URLSearchParams({ tipe, nama, id, kelas, waktu, status });
 
         fetch("https://script.google.com/macros/s/AKfycbwa6Nr_WDA1DM763RFYDnunCw-LKtDDBITNDqWNsb7Lp7TEAtCHmBuMOQG0HvVGAB4V/exec", {
           method: "POST",
+          mode: "cors",
           body: payload
         })
         .then(res => res.json())
@@ -182,20 +194,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
