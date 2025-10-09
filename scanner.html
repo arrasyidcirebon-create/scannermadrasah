@@ -25,6 +25,19 @@
      box-shadow: 0 0 8px rgba(255,255,255,0.15);
     }
 
+    h2 {
+    font-size: 1.4em;
+    font-weight: 600;
+    margin-top: 10px;
+    margin-bottom: 5px;
+  }
+
+  @media (max-width: 480px) {
+    h2 {
+      font-size: 1.1em;
+    }
+  }
+
     #reader {
       width: 90%;
       max-width: 420px;
@@ -60,12 +73,8 @@
 <body>
   <div class="logo">
     <img src="https://cdn.jsdelivr.net/gh/arrasyidcirebon-create/scannermadrasah/logo-madrasah.png" alt="Logo Madrasah">
-    <h2>📷 QR Scanner MDTU Ar Rasyid</h2>{
-      font-size: 1.4em;
-      font-weight: 600;
-      margin-top: 10px;
-      margin-bottom: 5px;
-    }
+    <h2>📷 QR Scanner MDTU Ar Rasyid</h2>
+    
   </div>
 
   <div id="reader"></div>
@@ -172,6 +181,7 @@
   </script>
 </body>
 </html>
+
 
 
 
