@@ -170,7 +170,7 @@
       function mulaiScan() {
         html5QrCode.start(
           { facingMode: "environment" },
-          { fps: 10, qrbox: 250 },
+          { fps: 10, qrbox: 200 },
           onScanSuccess
         ).catch(err => {
           tampilkanHasil("❌ Gagal membuka kamera: " + err.message, "#c62828");
@@ -182,6 +182,7 @@
   </script>
 </body>
 </html>
+
 
 
 
