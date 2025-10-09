@@ -19,12 +19,13 @@
     }
     #hasil {
       white-space: pre-line;
-      padding: 10px;
+      padding: 12px;
       margin: 10px auto;
       width: 90%;
       max-width: 400px;
-      border-radius: 8px;
+      border-radius: 10px;
       font-weight: bold;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     .logo {
       margin-top: 20px;
@@ -59,7 +60,6 @@
       const audioMasuk = document.getElementById("notifMasuk");
       const audioPulang = document.getElementById("notifPulang");
 
-      // Pemanasan audio agar tidak diblokir browser
       document.body.addEventListener("click", () => {
         [audioMasuk, audioPulang].forEach(audio => {
           if (audio && typeof audio.play === "function") {
@@ -68,10 +68,7 @@
               audio.pause();
               audio.currentTime = 0;
               audio.muted = false;
-              console.log("Audio siap:", audio.id);
-            }).catch(err => {
-              console.warn("Gagal memanaskan audio:", err);
-            });
+            }).catch(() => {});
           }
         });
       }, { once: true });
@@ -83,14 +80,15 @@
         hasil.style.color = "#fff";
       }
 
-      function mulaiScan() {
-        html5QrCode.start(
-          { facingMode: "environment" },
-          { fps: 10, qrbox: 250 },
-          onScanSuccess
-        ).catch(err => {
-          tampilkanHasil("❌ Gagal membuka kamera: " + err.message, "#c62828");
-        });
+      function validasiJamPresensi() {
+        const now = new Date();
+        const jam = now.getHours();
+        const menit = now.getMinutes();
+        const waktu = `${jam}:${menit.toString().padStart(2, '0')}`;
+
+        if (jam < 14) return { status: "masuk", waktu };
+        if (jam >= 15) return { status: "pulang", waktu };
+        return { status: "invalid", waktu };
       }
 
       function kirimKeSpreadsheet(qrText) {
@@ -101,8 +99,9 @@
           return;
         }
 
+        const { status, waktu } = validasiJamPresensi();
         const [tipe, nama, id, kelas] = bagian;
-        const payload = new URLSearchParams({ tipe, nama, id, kelas });
+        const payload = new URLSearchParams({ tipe, nama, id, kelas, waktu, status });
 
         fetch("https://script.google.com/macros/s/AKfycbwa6Nr_WDA1DM763RFYDnunCw-LKtDDBITNDqWNsb7Lp7TEAtCHmBuMOQG0HvVGAB4V/exec", {
           method: "POST",
@@ -112,24 +111,10 @@
         .then(res => {
           const warna = res.status === "success" ? "#2e7d32" :
                         res.status === "info" ? "#f9a825" : "#c62828";
-          tampilkanHasil(res.message, warna);
+          tampilkanHasil(res.message + "\nJam: " + waktu, warna);
 
-          const msg = res.message.toLowerCase();
-          const playAudio = (audio) => {
-            if (audio && typeof audio.play === "function") {
-              audio.pause();
-              audio.currentTime = 0;
-              audio.play().catch(err => {
-                console.warn("Gagal memutar audio:", err);
-              });
-            }
-          };
-
-          if (msg.includes("masuk")) {
-            playAudio(audioMasuk);
-          } else if (msg.includes("pulang")) {
-            playAudio(audioPulang);
-          }
+          if (status === "masuk") audioMasuk.play();
+          else if (status === "pulang") audioPulang.play();
 
           setTimeout(mulaiScan, 3000);
         })
@@ -145,6 +130,16 @@
           kirimKeSpreadsheet(text);
         }).catch(err => {
           tampilkanHasil("❌ Gagal menghentikan kamera: " + err.message, "#c62828");
+        });
+      }
+
+      function mulaiScan() {
+        html5QrCode.start(
+          { facingMode: "environment" },
+          { fps: 10, qrbox: 250 },
+          onScanSuccess
+        ).catch(err => {
+          tampilkanHasil("❌ Gagal membuka kamera: " + err.message, "#c62828");
         });
       }
 
